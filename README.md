@@ -1,1 +1,3 @@
-# Symetric-Cryptography-Algorithm
+# Symetric-Cryptography-Algorithms
+
+Simple AES and DES algorithms.
