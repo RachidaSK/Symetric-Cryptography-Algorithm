@@ -8,23 +8,16 @@ PI = [58, 50, 42, 34, 26, 18, 10, 2,
       61, 53, 45, 37, 29, 21, 13, 5,
       63, 55, 47, 39, 31, 23, 15, 7]
 
-# Initial permut made on the key
-CP_1 = [57, 49, 41, 33, 25, 17, 9,
-        1, 58, 50, 42, 34, 26, 18,
-        10, 2, 59, 51, 43, 35, 27,
-        19, 11, 3, 60, 52, 44, 36,
-        63, 55, 47, 39, 31, 23, 15,
-        7, 62, 54, 46, 38, 30, 22,
-        14, 6, 61, 53, 45, 37, 29,
-        21, 13, 5, 28, 20, 12, 4]
+# Final permut for datas after the 16 rounds
+PI_1 = [40, 8, 48, 16, 56, 24, 64, 32,
+        39, 7, 47, 15, 55, 23, 63, 31,
+        38, 6, 46, 14, 54, 22, 62, 30,
+        37, 5, 45, 13, 53, 21, 61, 29,
+        36, 4, 44, 12, 52, 20, 60, 28,
+        35, 3, 43, 11, 51, 19, 59, 27,
+        34, 2, 42, 10, 50, 18, 58, 26,
+        33, 1, 41, 9, 49, 17, 57, 25]
 
-# Permut applied on shifted key to get Ki+1
-CP_2 = [14, 17, 11, 24, 1, 5, 3, 28,
-        15, 6, 21, 10, 23, 19, 12, 4,
-        26, 8, 16, 7, 27, 20, 13, 2,
-        41, 52, 31, 37, 47, 55, 30, 40,
-        51, 45, 33, 48, 44, 49, 39, 56,
-        34, 53, 46, 42, 50, 36, 29, 32]
 
 # Expand matrix to get a 48bits matrix of datas to apply the xor with Ki
 E = [32, 1, 2, 3, 4, 5,
@@ -94,36 +87,45 @@ P = [16, 7, 20, 21, 29, 12, 28, 17,
      2, 8, 24, 14, 32, 27, 3, 9,
      19, 13, 30, 6, 22, 11, 4, 25]
 
-# Final permut for datas after the 16 rounds
-PI_1 = [40, 8, 48, 16, 56, 24, 64, 32,
-        39, 7, 47, 15, 55, 23, 63, 31,
-        38, 6, 46, 14, 54, 22, 62, 30,
-        37, 5, 45, 13, 53, 21, 61, 29,
-        36, 4, 44, 12, 52, 20, 60, 28,
-        35, 3, 43, 11, 51, 19, 59, 27,
-        34, 2, 42, 10, 50, 18, 58, 26,
-        33, 1, 41, 9, 49, 17, 57, 25]
+# Initial permut made on the key
+CP_1 = [57, 49, 41, 33, 25, 17, 9,
+        1, 58, 50, 42, 34, 26, 18,
+        10, 2, 59, 51, 43, 35, 27,
+        19, 11, 3, 60, 52, 44, 36,
+        63, 55, 47, 39, 31, 23, 15,
+        7, 62, 54, 46, 38, 30, 22,
+        14, 6, 61, 53, 45, 37, 29,
+        21, 13, 5, 28, 20, 12, 4]
+
+# Permut applied on shifted key to get Ki+1
+CP_2 = [14, 17, 11, 24, 1, 5, 3, 28,
+        15, 6, 21, 10, 23, 19, 12, 4,
+        26, 8, 16, 7, 27, 20, 13, 2,
+        41, 52, 31, 37, 47, 55, 30, 40,
+        51, 45, 33, 48, 44, 49, 39, 56,
+        34, 53, 46, 42, 50, 36, 29, 32]
+
 
 # Matrix that determine the shift for each round of keys
 SHIFT = [1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1]
 
 
-def string_to_bit_array(text):  # Convert a string into a list of bits
+def string2BitArray(text):  # Convert a string into a list of bits
     array = list()
     for char in text:
-        binval = binvalue(char, 8)  # Get the char value on one byte
+        binval = binValue(char, 8)  # Get the char value on one byte
         # Add the bits to the final list
         array.extend([int(x) for x in list(binval)])
     return array
 
 
-def bit_array_to_string(array):  # Recreate the string from the bit array
+def bitArray2String(array):  # Recreate the string from the bit array
     res = ''.join([chr(int(y, 2)) for y in [''.join([str(x)
                                                      for x in _bytes]) for _bytes in nsplit(array, 8)]])
     return res
 
 
-def binvalue(val, bitsize):  # Return the binary value as a string of the given size
+def binValue(val, bitsize):  # Return the binary value as a string of the given size
     binval = bin(val)[2:] if isinstance(val, int) else bin(ord(val))[2:]
     if len(binval) > bitsize:
         raise "binary value larger than the expected size"
@@ -166,7 +168,7 @@ class des():
         result = list()
         for block in text_blocks:  # Loop over all the blocks of data
             # Convert the block in bit array
-            block = string_to_bit_array(block)
+            block = string2BitArray(block)
             block = self.permut(block, PI)  # Apply the initial permutation
             g, d = nsplit(block, 32)  # g(LEFT), d(RIGHT)
             tmp = None
@@ -184,7 +186,7 @@ class des():
                 d = tmp
             # Do the last permut and append the result to result
             result += self.permut(d+g, PI_1)
-        final_res = bit_array_to_string(result)
+        final_res = bitArray2String(result)
         if padding and action == DECRYPT:
             # Remove the padding if decrypt and padding is true
             return self.removePadding(final_res)
@@ -202,7 +204,7 @@ class des():
             column = int(''.join([str(x) for x in block[1:][:-1]]), 2)
             # Take the value in the SBOX appropriated for the round (i)
             val = S_BOX[i][row][column]
-            bin = binvalue(val, 4)  # Convert the value to binary
+            bin = binValue(val, 4)  # Convert the value to binary
             # And append it to the resulting list
             result += [int(x) for x in bin]
         return result
@@ -219,7 +221,7 @@ class des():
 
     def generatekeys(self):  # Algorithm that generates all the keys
         self.keys = []
-        key = string_to_bit_array(self.password)
+        key = string2BitArray(self.password)
         key = self.permut(key, CP_1)  # Apply the initial permut on the key
         g, d = nsplit(key, 28)  # Split it in to (g->LEFT),(d->RIGHT)
         for i in range(16):  # Apply the 16 rounds
@@ -249,10 +251,15 @@ class des():
 
 
 if __name__ == '__main__':
-    key = "secret_k"
-    text = "Rachi wo"
+
+    print('This program encrypts your plain text using Data Encryption Standard')
+    print('\n')
+    key = input('Please enter a key (ex: secret_k): ')
+    text = input('Please enter your plain text (ex: Hello wo): ')
+    print('\n')
     d = des()
     r = d.encrypt(key, text)
     r2 = d.decrypt(key, r)
+    print('plain text: ', text)
     print("Ciphered: %r" % r)
     print("Deciphered: ", r2)
