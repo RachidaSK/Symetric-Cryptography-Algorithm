@@ -1,4 +1,4 @@
-# Initial permut matrix for the datas
+# Initial permute matrix for the data
 PI = [58, 50, 42, 34, 26, 18, 10, 2,
       60, 52, 44, 36, 28, 20, 12, 4,
       62, 54, 46, 38, 30, 22, 14, 6,
@@ -8,7 +8,7 @@ PI = [58, 50, 42, 34, 26, 18, 10, 2,
       61, 53, 45, 37, 29, 21, 13, 5,
       63, 55, 47, 39, 31, 23, 15, 7]
 
-# Final permut for datas after the 16 rounds
+# Final permute for data after the 16 rounds
 PI_1 = [40, 8, 48, 16, 56, 24, 64, 32,
         39, 7, 47, 15, 55, 23, 63, 31,
         38, 6, 46, 14, 54, 22, 62, 30,
@@ -19,7 +19,7 @@ PI_1 = [40, 8, 48, 16, 56, 24, 64, 32,
         33, 1, 41, 9, 49, 17, 57, 25]
 
 
-# Expand matrix to get a 48bits matrix of datas to apply the xor with Ki
+# Expand matrix to get a 48bits matrix of data to apply the xor with Ki
 E = [32, 1, 2, 3, 4, 5,
      4, 5, 6, 7, 8, 9,
      8, 9, 10, 11, 12, 13,
@@ -81,13 +81,13 @@ S_BOX = [
      ]
 ]
 
-# Permut made after each SBox substitution for each round
+# Permute made after each SBox substitution for each round
 P = [16, 7, 20, 21, 29, 12, 28, 17,
      1, 15, 23, 26, 5, 18, 31, 10,
      2, 8, 24, 14, 32, 27, 3, 9,
      19, 13, 30, 6, 22, 11, 4, 25]
 
-# Initial permut made on the key
+# Initial permute made on the key
 CP_1 = [57, 49, 41, 33, 25, 17, 9,
         1, 58, 50, 42, 34, 26, 18,
         10, 2, 59, 51, 43, 35, 27,
@@ -97,7 +97,7 @@ CP_1 = [57, 49, 41, 33, 25, 17, 9,
         14, 6, 61, 53, 45, 37, 29,
         21, 13, 5, 28, 20, 12, 4]
 
-# Permut applied on shifted key to get Ki+1
+# Permute applied on shifted key to get Ki+1
 CP_2 = [14, 17, 11, 24, 1, 5, 3, 28,
         15, 6, 21, 10, 23, 19, 12, 4,
         26, 8, 16, 7, 27, 20, 13, 2,
@@ -169,7 +169,7 @@ class des():
         for block in text_blocks:  # Loop over all the blocks of data
             # Convert the block in bit array
             block = string2BitArray(block)
-            block = self.permut(block, PI)  # Apply the initial permutation
+            block = self.permute(block, PI)  # Apply the initial permuteation
             g, d = nsplit(block, 32)  # g(LEFT), d(RIGHT)
             tmp = None
             for i in range(16):  # Do the 16 rounds
@@ -180,12 +180,12 @@ class des():
                     # If decrypt start by the last key
                     tmp = self.xor(self.keys[15-i], d_e)
                 tmp = self.substitute(tmp)  # Method that will apply the SBOXes
-                tmp = self.permut(tmp, P)
+                tmp = self.permute(tmp, P)
                 tmp = self.xor(g, tmp)
                 g = d
                 d = tmp
-            # Do the last permut and append the result to result
-            result += self.permut(d+g, PI_1)
+            # Do the last permute and append the result to result
+            result += self.permute(d+g, PI_1)
         final_res = bitArray2String(result)
         if padding and action == DECRYPT:
             # Remove the padding if decrypt and padding is true
@@ -209,10 +209,11 @@ class des():
             result += [int(x) for x in bin]
         return result
 
-    def permut(self, block, table):  # Permut the given block using the given table (so generic method)
+    # Permute the given block using the given table (so generic method)
+    def permute(self, block, table):
         return [block[x-1] for x in table]
 
-    # Do the exact same thing than permut but for more clarity has been renamed
+    # Do the exact same thing than permute but for more clarity has been renamed
     def expand(self, block, table):
         return [block[x-1] for x in table]
 
@@ -222,19 +223,19 @@ class des():
     def generatekeys(self):  # Algorithm that generates all the keys
         self.keys = []
         key = string2BitArray(self.password)
-        key = self.permut(key, CP_1)  # Apply the initial permut on the key
+        key = self.permute(key, CP_1)  # Apply the initial permute on the key
         g, d = nsplit(key, 28)  # Split it in to (g->LEFT),(d->RIGHT)
         for i in range(16):  # Apply the 16 rounds
             # Apply the shift associated with the round (not always 1)
             g, d = self.shift(g, d, SHIFT[i])
             tmp = g + d  # Merge them
-            # Apply the permut to get the Ki
-            self.keys.append(self.permut(tmp, CP_2))
+            # Apply the permute to get the Ki
+            self.keys.append(self.permute(tmp, CP_2))
 
     def shift(self, g, d, n):  # Shift a list of the given value
         return g[n:] + g[:n], d[n:] + d[:n]
 
-    def addPadding(self):  # Add padding to the datas using PKCS5 spec.
+    def addPadding(self):  # Add padding to the data using PKCS5 spec.
         pad_len = 8 - (len(self.text) % 8)
         self.text += pad_len * chr(pad_len)
 
