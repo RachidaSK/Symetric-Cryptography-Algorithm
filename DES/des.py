@@ -261,6 +261,6 @@ if __name__ == '__main__':
     d = des()
     r = d.encrypt(key, text)
     r2 = d.decrypt(key, r)
-    print('plain text: ', text)
+    print('plaintext: ', text)
     print("Ciphered: %r" % r)
     print("Deciphered: ", r2)
