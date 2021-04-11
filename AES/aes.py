@@ -91,15 +91,24 @@ def decrypt(ctext):
     return vecToInt(addKey(intToVec((w[0] << 8) + w[1]), state))
 
 
-if __name__ == '__main__':
-    # Test vectors from "Simplified AES" (Steven Gordon)
-    # (http://hw.siit.net/files/001283.pdf)
+def getBin(x, n):
+    return format(x, 'b').zfill(n)
 
-    def getBin(x, n): return format(x, 'b').zfill(n)
+
+if __name__ == '__main__':
+
+    print('This program encrypts your binary plaintext using Advanced Encryption Standard')
+    print('\n')
 
     plaintext = 0b0110111101101011
     key = 0b1010011100111011
     ciphertext = 0b0000011100111000
     keyExp(key)
-    print('encrypting', getBin(encrypt(plaintext), 16))
-    print('decrypting', getBin(decrypt(ciphertext)))
+    textValue = getBin(plaintext, 16)
+    cipher = getBin(encrypt(plaintext), 16)
+    plain = getBin(decrypt(ciphertext), 16)
+
+    print('Plaintext: ', textValue)
+    print('Ciphered: ', cipher)
+    print('Deciphered: ', plain)
+    print('\n')
